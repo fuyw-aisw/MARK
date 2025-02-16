@@ -7,7 +7,7 @@ In this paper, we introduce a new perspective of leveraging large language model
 
 ## Framework
 
-
+<img src="overview.pdf">
 
 ## Installation
 
