@@ -6,7 +6,7 @@ PyTorch implementation for "MARK: Multi-agent Collaboration with Ranking Guidanc
 In this paper, we introduce a new perspective of leveraging large language models (LLMs) to enhance text-attributed graph clustering and develop a novel approach named Multi-agent Collaboration with Ranking Guidance (MARK). 
 
 ## Framework
-<img src="Overview.pdf">
+<img src="overview.pdf">
 
 ## Installation
 
