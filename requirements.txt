@@ -11,15 +11,15 @@ async-timeout==4.0.3
 attrs==24.2.0
 beautifulsoup4==4.12.3
 bitsandbytes==0.42.0
-Brotli @ file:///home/conda/feedstock_root/build_artifacts/brotli-split_1725267488082/work
+Brotli==1.1.0
 bs4==0.0.2
 cachetools==5.5.0
 certifi==2022.12.7
-cffi @ file:///home/conda/feedstock_root/build_artifacts/cffi_1725560520483/work
+cffi==1.17.1
 charset-normalizer==2.1.1
 click==8.1.7
 cmake==3.25.0
-colorama @ file:///home/conda/feedstock_root/build_artifacts/colorama_1666700638685/work
+colorama==0.4.6
 colorlog==6.9.0
 comm==0.2.2
 contourpy==1.3.1
@@ -55,7 +55,7 @@ greenlet==3.1.1
 grpcio==1.68.0
 grpcio-status==1.68.0
 h11==0.14.0
-h2 @ file:///home/conda/feedstock_root/build_artifacts/h2_1634280454336/work
+h2==4.1.0
 h5py==3.12.1
 hpack==4.0.0
 httpcore==1.0.7
@@ -63,8 +63,8 @@ httplib2==0.22.0
 httpx==0.28.0
 httpx-sse==0.4.0
 huggingface-hub==0.26.3
-hyperframe @ file:///home/conda/feedstock_root/build_artifacts/hyperframe_1619110129307/work
-idna @ file:///home/conda/feedstock_root/build_artifacts/idna_1726459485162/work
+hyperframe==6.0.1
+idna==3.10
 InstructorEmbedding==1.0.1
 ipdb==0.13.13
 ipykernel==6.29.5
@@ -117,20 +117,20 @@ prompt_toolkit==3.0.48
 propcache==0.2.0
 proto-plus==1.25.0
 protobuf==5.29.0
-psutil @ file:///home/conda/feedstock_root/build_artifacts/psutil_1729847040822/work
+psutil==6.1.0
 ptyprocess==0.7.0
 pure_eval==0.2.3
 pyarrow==18.1.0
 pyasn1==0.6.1
 pyasn1_modules==0.4.1
-pycparser @ file:///home/conda/feedstock_root/build_artifacts/pycparser_1711811537435/work
+pycparser==2.22
 pydantic==2.10.2
 pydantic-settings==2.6.1
 pydantic_core==2.27.1
-pyg-lib @ https://data.pyg.org/whl/torch-2.0.0%2Bcu118/pyg_lib-0.2.0%2Bpt20cu118-cp310-cp310-linux_x86_64.whl#sha256=14d9abae57a932f477543bd32fe52733cfbe4b333d19fe7b8ebee8a87545c72b
+pyg-lib==0.2.0+pt20cu118
 Pygments==2.18.0
 pyparsing==3.2.0
-PySocks @ file:///home/conda/feedstock_root/build_artifacts/pysocks_1661604839144/work
+PySocks==1.7.1
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 python-json-logger==3.2.1
@@ -139,7 +139,7 @@ pytz==2024.2
 PyYAML==6.0.2
 pyzmq==26.2.0
 regex==2024.11.6
-requests @ file:///home/conda/feedstock_root/build_artifacts/requests_1717057054362/work
+requests==2.32.3
 requests-toolbelt==1.0.0
 rsa==4.9
 safetensors==0.4.5
@@ -166,15 +166,15 @@ tiktoken==0.8.0
 tokenizers==0.20.3
 tomli==2.2.1
 torch==2.0.0+cu118
-torch-cluster @ https://data.pyg.org/whl/torch-2.0.0%2Bcu118/torch_cluster-1.6.1%2Bpt20cu118-cp310-cp310-linux_x86_64.whl#sha256=c793bfb58cab30a9add57df77b1815dc061e1ce62dee749fa505dd811c2ce53d
+torch-cluster==1.6.1+pt20cu118
 torch-geometric==2.6.1
-torch-scatter @ https://data.pyg.org/whl/torch-2.0.0%2Bcu118/torch_scatter-2.1.1%2Bpt20cu118-cp310-cp310-linux_x86_64.whl#sha256=dc950e83fb1c9f5be6dc3e4778fce8a4904a9f1848d960e9a2049783237444ba
-torch-sparse @ https://data.pyg.org/whl/torch-2.0.0%2Bcu118/torch_sparse-0.6.17%2Bpt20cu118-cp310-cp310-linux_x86_64.whl#sha256=256559b48f6bcf57e999a783e4e7c52405cc57d19e10f4aac0bfc3c88f5afc41
-torch-spline-conv @ https://data.pyg.org/whl/torch-2.0.0%2Bcu118/torch_spline_conv-1.2.2%2Bpt20cu118-cp310-cp310-linux_x86_64.whl#sha256=0a2c85380e3d0e2155956d5105a428879f7fafdd0812c0bb8aedad23f111369d
+torch-scatter==2.1.1+pt20cu118
+torch-sparse==0.6.17+pt20cu118
+torch-spline-conv==1.2.2+pt20cu118
 torchaudio==2.0.1+cu118
 torchvision==0.15.1+cu118
 tornado==6.4.2
-tqdm @ file:///home/conda/feedstock_root/build_artifacts/tqdm_1732497199771/work
+tqdm==4.67.1
 traitlets==5.14.3
 transformers==4.46.3
 triton==2.0.0
