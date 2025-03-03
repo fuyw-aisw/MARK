@@ -16,11 +16,11 @@ def batched_data(inputs, batch_size):
 
 def get_sentence_embeddings(texts,embed_type="sbert",device="cuda:0",batch_size=64):
     if embed_type == "sbert":
-        tokenizer = AutoTokenizer.from_pretrained('sentence-transformers/all-MiniLM-L12-v2')#('/data/ywfu/codes/Pythondata/sentence-transformers/all-mpnet-base-v2')
-        model = AutoModel.from_pretrained('sentence-transformers/all-MiniLM-L12-v2').to(device)#('/data/ywfu/codes/Pythondata/sentence-transformers/all-mpnet-base-v2').to(device) 
+        tokenizer = AutoTokenizer.from_pretrained('sentence-transformers/all-MiniLM-L12-v2')
+        model = AutoModel.from_pretrained('sentence-transformers/all-MiniLM-L12-v2').to(device) 
     else:
-        tokenizer = AutoTokenizer.from_pretrained("/data/ywfu/codes/Pythondata/microsoft/deberta-base")
-        model = AutoModel.from_pretrained("/data/ywfu/codes/Pythondata/microsoft/deberta-base").to(device)
+        tokenizer = AutoTokenizer.from_pretrained("microsoft/deberta-base")
+        model = AutoModel.from_pretrained("microsoft/deberta-base").to(device)
     output = []
     with torch.no_grad():
         for batch in tqdm(batched_data(texts, batch_size)):
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     for name in dataset:
         for embed_type in embedding:
             print(name,embed_type,"prepare")
-            data = torch.load(f"/data/ywfu/codes/Pythondata/Graph-LLM-master/preprocessed_data/new/{name}_fixed_sbert.pt")
+            data = torch.load(f"../Graph-LLM-master/preprocessed_data/new/{name}_fixed_sbert.pt")
             data.x = get_sentence_embeddings(data.raw_texts,embed_type=embed_type)
             del data.train_masks
             del data.val_masks
