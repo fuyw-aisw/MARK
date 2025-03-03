@@ -129,12 +129,9 @@ def efficient_gpt_text_ind(input_text):
         final_prompt = conv.get_prompt()
         prompts.append({'idx': idx, "prompt": final_prompt})
 
-    # 使用 ThreadPoolExecutor 并行化调用 call_api
     with ThreadPoolExecutor(max_workers=10) as executor:
-        # 提交任务到线程池
         futures = {executor.submit(call_api, prompt, temperature=0, max_tokens=300): prompt['idx'] for prompt in prompts}
         
-        # 使用 tqdm 显示进度条
         for future in tqdm(as_completed(futures), total=len(prompts)):
             idx = futures[future]
             try:
@@ -171,21 +168,17 @@ def efficient_gpt_text_ge(input_text):
         final_prompt = conv.get_prompt()
         prompts.append({'idx': idx, "prompt": final_prompt})
 
-    # 使用 ThreadPoolExecutor 并行化调用 call_api
     with ThreadPoolExecutor(max_workers=10) as executor:
-        # 提交任务到线程池，并记录每个任务的 idx
         futures = {executor.submit(call_api, prompt, temperature=0, max_tokens=1000): prompt['idx'] for prompt in prompts}
         
-        # 使用 tqdm 显示进度条
         for future in tqdm(as_completed(futures), total=len(prompts)):
-            idx = futures[future]  # 获取当前任务对应的 idx
+            idx = futures[future] 
             try:
-                result = future.result()  # 获取任务结果
-                gpt_result.append([result, idx])  # 将结果和 idx 存入 gpt_result
+                result = future.result() 
+                gpt_result.append([result, idx]) 
             except Exception as e:
                 print(f"Error occurred for prompt index {idx}: {e}")
 
-    # 按照原始顺序排序并提取结果
     #breakpoint()
     gpt_result = sorted(gpt_result, key=lambda x: x[-1])
     #print(gpt_result)
@@ -212,31 +205,25 @@ def efficient_gpt_text_cls(input_text, n_clusters):
     classes = np.arange(n_clusters)
     probs = [1 / len(classes)] * len(classes)
 
-    # 准备 prompts
     for idx, text in enumerate(input_text):
         conv = conv_v3.copy()
         conv.append_message(conv.roles[0], text)
         final_prompt = conv.get_prompt()
         prompts.append({'idx': idx, "prompt": final_prompt})
 
-    # 使用 ThreadPoolExecutor 并行化调用 call_api
     with ThreadPoolExecutor(max_workers=10) as executor:
-        # 提交任务到线程池，并记录每个任务的 idx
         futures = {executor.submit(call_api, prompt, temperature=0, max_tokens=100): prompt['idx'] for prompt in prompts}
         
-        # 使用 tqdm 显示进度条
         for future in tqdm(as_completed(futures), total=len(prompts)):
-            idx = futures[future]  # 获取当前任务对应的 idx
+            idx = futures[future]
             try:
-                result = future.result()  # 获取任务结果
-                gpt_result.append([result, idx])  # 将结果和 idx 存入 gpt_result
+                result = future.result()
+                gpt_result.append([result, idx])
             except Exception as e:
                 print(f"Error occurred for prompt index {idx}: {e}")
-                # 如果任务失败，随机分配一个类别
                 gpt_result.append([{"answer":str(random.choices(classes, probs)[0]+1),"reason":""}, idx])
 
-    # 按照原始顺序排序并提取结果
-    gpt_result = sorted(gpt_result, key=lambda x: x[-1])  # 按 idx 排序
+    gpt_result = sorted(gpt_result, key=lambda x: x[-1]) 
     result_cls = []
     for i in range(len(gpt_result)):
         result = None
@@ -259,31 +246,23 @@ def efficient_gpt_text_cls_equ(input_text):
     gpt_result = []
     prompts = []
 
-    # 准备 prompts
     for idx, text in enumerate(input_text):
         conv = conv_v3.copy()
         conv.append_message(conv.roles[0], text)
         final_prompt = conv.get_prompt()
         prompts.append({'idx': idx, "prompt": final_prompt})
-
-    # 使用 ThreadPoolExecutor 并行化调用 call_api
     with ThreadPoolExecutor(max_workers=10) as executor:
-        # 提交任务到线程池，并记录每个任务的 idx
         futures = {executor.submit(call_api, prompt, temperature=0, max_tokens=100): prompt['idx'] for prompt in prompts}
         
-        # 使用 tqdm 显示进度条
         for future in tqdm(as_completed(futures), total=len(prompts)):
-            idx = futures[future]  # 获取当前任务对应的 idx
+            idx = futures[future]
             try:
-                result = future.result()  # 获取任务结果
-                gpt_result.append((result, idx))  # 将结果和 idx 存入 gpt_result
+                result = future.result() 
+                gpt_result.append((result, idx))
             except Exception as e:
                 print(f"Error occurred for prompt index {idx}: {e}")
-                # 如果任务失败，随机分配一个类别
                 gpt_result.append([{"answer":str(random.choice([0, 1])),"reason":""}, idx]) 
-
-    # 按照原始顺序排序并提取结果
-    gpt_result = sorted(gpt_result, key=lambda x: x[-1])  # 按 idx 排序
+    gpt_result = sorted(gpt_result, key=lambda x: x[-1]) 
     result_cls = []
     for i in range(len(gpt_result)):
         try:
@@ -376,7 +355,7 @@ def parse_llama_output(output_text):
         return -1
 
 @torch.inference_mode()
-def efficient_llama_text_cls(input_text,device,model_name="/data/ywfu/codes/Pythondata/meta-llama/Llama-3.1-70B-Instruct/", rewrite=True):
+def efficient_llama_text_cls(input_text,device,model_name="meta-llama/Llama-3.1-70B-Instruct/", rewrite=True):
     tokenizer, model = load_llama_model(model_name,device)
     llama_result = []
     for idx,text in enumerate(input_text):
@@ -422,7 +401,7 @@ def llama_generate(input_text, tokenizer, model,device,max_new=1000):
     return generated_text
 
 @torch.inference_mode()
-def efficient_llama_text(input_text,device,model_name="/data/ywfu/codes/Pythondata/meta-llama/Llama-3.1-70B-Instruct/", rewrite=True):
+def efficient_llama_text(input_text,device,model_name="meta-llama/Llama-3.1-70B-Instruct/", rewrite=True):
     tokenizer, model = load_llama_model(model_name,device)
     llama_result = []
     for idx,text in enumerate(input_text):
