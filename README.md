@@ -29,5 +29,4 @@ And then put them into the folder `MARK/preprocessed_data`.
 
 ```
 python main_magi.py
-
 ```
