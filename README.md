@@ -24,8 +24,8 @@ pip install torch_scatter torch_sparse torch_cluster torch_spline_conv torch_geo
 ```
 ## Usage
 
-Download preprocessed data from [here] (https://drive.google.com/drive/folders/1Yz2AsR8gkY1W-pOpniI52bDG1ABvdEAF?usp=sharing). \
-And then put them into the folder `MARK/preprocessed_data`. \
+Download preprocessed data from [here](https://drive.google.com/drive/folders/1Yz2AsR8gkY1W-pOpniI52bDG1ABvdEAF?usp=sharing). \
+And then put them into the folder `MARK/preprocessed_data`.
 
 ```
 python main_magi.py
