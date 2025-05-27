@@ -200,12 +200,12 @@ def train(args,data,seeds):
 
             #print(uncertain_mask)
             #loss = args.beta * cl_loss1 + (1 - args.beta) * cl_loss2 + dis_loss
-            if args.dataset in ['cora','wikics']:
-                loss = args.beta * cl_loss1 + (1-args.beta)*cl_loss2          
-                log(f"{epoch+1} finetune_epoch ||| Loss: {round(float(loss),3)}||| cl_loss1: {round(float(cl_loss1),3)}  ||| cl_loss2: {round(float(cl_loss2),3)}")
-            else:
+            if args.dataset in ['citeseer','pubmed']:
                 loss = args.beta * magi_loss + (1-args.beta)*cl_loss2          
                 log(f"{epoch+1} finetune_epoch ||| Loss: {round(float(loss),3)}||| magi_loss: {round(float(magi_loss),3)}  ||| cl_loss2: {round(float(cl_loss2),3)}")
+            else:
+                loss = args.beta * cl_loss1 + (1-args.beta)*cl_loss2          
+                log(f"{epoch+1} finetune_epoch ||| Loss: {round(float(loss),3)}||| magi_loss: {round(float(cl_loss1),3)}  ||| cl_loss2: {round(float(cl_loss2),3)}")
             train_loss['llm_train'].append(loss.clone().detach().cpu().numpy())
             
             loss.backward()
