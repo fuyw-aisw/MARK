@@ -23,6 +23,9 @@ pip install torch==2.0.0 torchvision==0.15.1 torchaudio==2.0.1 --index-url https
 pip install torch_scatter torch_sparse torch_cluster torch_spline_conv torch_geometric -f https://data.pyg.org/whl/torch-2.0.0%2Bcu118.html ### GPU
 ```
 ## Usage
+```
+Download preprocessed data from \url{https://drive.google.com/drive/folders/1Yz2AsR8gkY1W-pOpniI52bDG1ABvdEAF?usp=sharing}
+```
 
 ```
 python main_magi.py
