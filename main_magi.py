@@ -16,6 +16,7 @@ from utils import log, top_k_samples
 from torch_geometric.utils import to_dense_adj
 from call_api import call_api
 import prompt
+import torch.nn as nn
 import warnings
 warnings.filterwarnings("ignore")
 #from sklearn.cluster import KMeans
@@ -56,8 +57,9 @@ def train(args,data,seeds):
             optimizer.step()
             
             if (epoch+1) % 100 == 0:
+                
                 model.eval()    
-                conduct_list,modul_list,acc_list,nmi_list,ari_list,f1_list = {'all':[],'mis':[],'unmis':[]},{'all':[],'mis':[],'unmis':[]},{'all':[],'mis':[],'unmis':[]},{'all':[],'mis':[],'unmis':[]},{'all':[],'mis':[],'unmis':[]},{'all':[],'mis':[],'unmis':[]}
+                conduct_list,modul_list,acc_list,nmi_list,ari_list,f1_list = [],[],[],[],[],[]
                 with torch.no_grad():                
                     g_feat1,g_feat2,_,_ = model(data_obj)
                     #y_pred,_,mis_mask = model.cluster(g_feat1,g_feat2)
@@ -71,45 +73,24 @@ def train(args,data,seeds):
                         nmi = normalized_mutual_info_score(y_true,y_assignments)
                         ari = adjusted_rand_score(y_true, y_assignments)
                         acc,f1 = calculate_accuracy_and_f1(y_true,y_assignments)
-                        #g_feat = g_feat1.cpu().detach().numpy()
-                        # hard samples
-                        nmi_hard = normalized_mutual_info_score(y_true[mis_mask],y_assignments[mis_mask])
-                        ari_hard = adjusted_rand_score(y_true[mis_mask], y_assignments[mis_mask])
-                        acc_hard,f1_hard = calculate_accuracy_and_f1(y_true[mis_mask],y_assignments[mis_mask])
-                    
-                        # easy samples
-                        nmi_easy = normalized_mutual_info_score(y_true[~mis_mask],y_assignments[~mis_mask])
-                        ari_easy = adjusted_rand_score(y_true[~mis_mask], y_assignments[~mis_mask])
-  
-                        acc_easy,f1_easy = calculate_accuracy_and_f1(y_true[~mis_mask],y_assignments[~mis_mask]) 
-                        conduct_list['all'].append(conduct)
-                        modul_list['all'].append(modul)
-                        acc_list['all'].append(acc)
-                        nmi_list['all'].append(nmi)
-                        ari_list['all'].append(ari)
-                        f1_list['all'].append(f1) 
-
-                        acc_list['mis'].append(acc_hard)
-                        nmi_list['mis'].append(nmi_hard)
-                        ari_list['mis'].append(ari_hard)
-                        f1_list['mis'].append(f1_hard) 
-                        acc_list['unmis'].append(acc_easy)
-                        nmi_list['unmis'].append(nmi_easy)
-                        ari_list['unmis'].append(ari_easy)
-                        f1_list['unmis'].append(f1_easy)                         
+                        conduct_list.append(conduct)
+                        modul_list.append(modul)
+                        acc_list.append(acc)
+                        nmi_list.append(nmi)
+                        ari_list.append(ari)
+                        f1_list.append(f1) 
+                      
                         log(f"{epoch+1} {seed} pretrain_val_epoch ||| conductance: {round(float(conduct),3)} ||| modularity: {round(float(modul),3)} ||| accuracy: {round(float(acc),3)} ||| nmi: {round(float(nmi),3)} |||ari: {round(float(ari),3)}|||f1 score : {round(float(f1),3)}")
-                        log(f"{epoch+1} {seed} pretrain_val_epoch easy ||| accuracy: {round(float(acc_easy),3)} ||| nmi: {round(float(nmi_easy),3)} |||ari: {round(float(ari_easy),3)}|||f1 score : {round(float(f1_easy),3)}")
-                        log(f"{epoch+1} {seed} pretrain_val_epoch hard ||| accuracy: {round(float(acc_hard),3)} ||| nmi: {round(float(nmi_hard),3)} |||ari: {round(float(ari_hard),3)}|||f1 score : {round(float(f1_hard),3)}") 
                     
-                    log(f"{epoch+1} {seed} pretrain_val_epoch ||| conductance mean: {round(float(np.mean(conduct_list['all'])),3)}  ||| conductance std: {round(float(np.std(conduct_list['all'])),3)}||| modularity mean : {round(float(np.mean(modul_list['all'])),3)} ||| modularity std : {round(float(np.std(modul_list['all'])),3)} ||| accuracy mean: {round(float(np.mean(acc_list['all'])),3)}||| accuracy std: {round(float(np.std(acc_list['all'])),3)} ||| nmi mean: {round(float(np.mean(nmi_list['all'])),3)} ||| nmi std: {round(float(np.std(nmi_list['all'])),3)}|||ari mean: {round(float(np.mean(ari_list['all'])),3)}|||ari std: {round(float(np.std(ari_list['all'])),3)}|||f1 score mean: {round(float(np.mean(f1_list['all'])),3)}|||f1 score std: {round(float(np.std(f1_list['all'])),3)}")
-                    log(f"{epoch+1} {seed} pretrain_val_epoch easy||| accuracy mean: {round(float(np.mean(acc_list['unmis'])),3)}||| accuracy std: {round(float(np.std(acc_list['unmis'])),3)} ||| nmi mean: {round(float(np.mean(nmi_list['unmis'])),3)} ||| nmi std: {round(float(np.std(nmi_list['unmis'])),3)}|||ari mean: {round(float(np.mean(ari_list['unmis'])),3)}|||ari std: {round(float(np.std(ari_list['unmis'])),3)}|||f1 score mean: {round(float(np.mean(f1_list['unmis'])),3)}|||f1 score std: {round(float(np.std(f1_list['unmis'])),3)}")
-                    log(f"{epoch+1} {seed} pretrain_val_epoch hard ||| accuracy mean: {round(float(np.mean(acc_list['mis'])),3)}||| accuracy std: {round(float(np.std(acc_list['mis'])),3)} ||| nmi mean: {round(float(np.mean(nmi_list['mis'])),3)} ||| nmi std: {round(float(np.std(nmi_list['mis'])),3)}|||ari mean: {round(float(np.mean(ari_list['mis'])),3)}|||ari std: {round(float(np.std(ari_list['mis'])),3)}|||f1 score mean: {round(float(np.mean(f1_list['mis'])),3)}|||f1 score std: {round(float(np.std(f1_list['mis'])),3)}")
+                    log(f"{epoch+1} pretrain_val_epoch ||| conductance mean: {round(float(np.mean(conduct_list)),3)}  ||| conductance std: {round(float(np.std(conduct_list)),3)}||| modularity mean : {round(float(np.mean(modul_list)),3)} ||| modularity std : {round(float(np.std(modul_list)),3)} ||| accuracy mean: {round(float(np.mean(acc_list)),3)}||| accuracy std: {round(float(np.std(acc_list)),3)} ||| nmi mean: {round(float(np.mean(nmi_list)),3)} ||| nmi std: {round(float(np.std(nmi_list)),3)}|||ari mean: {round(float(np.mean(ari_list)),3)}|||ari std: {round(float(np.std(ari_list)),3)}|||f1 score mean: {round(float(np.mean(f1_list)),3)}|||f1 score std: {round(float(np.std(f1_list)),3)}") 
             
         #finetuning
-        torch.save(model.state_dict(), f"models/magi_{args.dataset}_we_{args.alpha}_tau_{args.tau1}_pretrain.pt")
+        
+        
+        #torch.save(model.state_dict(), f"models/magi_{args.dataset}_we_{args.alpha}_tau_{args.tau1}_pretrain_dis.pt")
 
 
-        model.load_state_dict(torch.load(f"models/magi_{args.dataset}_we_{args.alpha}_tau_{args.tau1}_pretrain.pt",map_location=args.device))
+        #model.load_state_dict(torch.load(f"models/magi_{args.dataset}_we_{args.alpha}_tau_{args.tau1}_pretrain_dis.pt",map_location=args.device))
         #breakpoint()
         texts_llm_ge = {}
         labels_llm_ge = {}
@@ -120,7 +101,7 @@ def train(args,data,seeds):
             mask_aug1 = get_modul_mask(data_aug1.cpu(),args)
             mask_aug2 = get_modul_mask(data_aug2.cpu(),args)
             magi_loss = model.magi_loss(g_feat1,mask_aug1) + model.magi_loss(g_feat2,mask_aug2)
-
+            #torch.save(g_feat1.detach().cpu(),f"models/g_feat_{args.dataset}.pt")
             cl_loss1 = model.cl_loss1(g_feat1,g_feat2,args.tau1)
             if epoch % 100 == 0:
                 y_assignments,mis_mask = model.cluster(g_feat1,g_feat2)
@@ -141,20 +122,24 @@ def train(args,data,seeds):
                 print(mapping)
                 #print(confident_node_idx)
                 print('----')
+                print(uncertain_mask)
+                print(confi_mask)
 
                 prompts_topics = prompt.prompt_cluster_sum(data_obj=data, confi_mask=confi_mask, dataset_name=args.dataset)
+                #print(prompts_topics)
+
                 topics_generate, topics_reason = prompt.efficient_gpt_text_ind(prompts_topics)
                 print(topics_generate)
-                with open(f'jsons/magi_topics_{args.dataset}_we_{args.alpha}_{args.beta}_tau_{args.tau1}_{args.tau2}.json', 'w', encoding='utf-8') as f:
+                with open(f'jsons/magi_topics_{args.dataset}_we_{args.alpha}_{args.beta}_tau_{args.tau1}_{args.tau2}{args.suff}.json', 'w', encoding='utf-8') as f:
                     json.dump(topics_generate, f, ensure_ascii=False, indent=4)
-                with open(f'jsons/magi_topics_reason_{args.dataset}_we_{args.alpha}_{args.beta}_tau_{args.tau1}_{args.tau2}.json', 'w', encoding='utf-8') as f:
+                with open(f'jsons/magi_topics_reason_{args.dataset}_we_{args.alpha}_{args.beta}_tau_{args.tau1}_{args.tau2}{args.suff}.json', 'w', encoding='utf-8') as f:
                     json.dump(topics_reason, f, ensure_ascii=False, indent=4)    
                 prompts_generate = prompt.prompt_neighbor_generate(data_obj=data, sampled_node_idxs=uncertain_mask, dataset_name=args.dataset, g_feat=g_feat1.detach().cpu().numpy(), topic_clusters=topics_generate, hop=args.hop, sample_num=args.k)
                 texts_generate, texts_reason = prompt.efficient_gpt_text_ge(prompts_generate) #texts
                 #print(texts_generate)
-                with open(f'jsons/magi_texts_{args.dataset}_we_{args.alpha}_{args.beta}_tau_{args.tau1}_{args.tau2}.json', 'w', encoding='utf-8') as f:
+                with open(f'jsons/magi_texts_{args.dataset}_we_{args.alpha}_{args.beta}_tau_{args.tau1}_{args.tau2}{args.suff}.json', 'w', encoding='utf-8') as f:
                     json.dump(texts_generate, f, ensure_ascii=False, indent=4) 
-                with open(f'jsons/magi_texts_reason_{args.dataset}_we_{args.alpha}_{args.beta}_tau_{args.tau1}_{args.tau2}.json', 'w', encoding='utf-8') as f:
+                with open(f'jsons/magi_texts_reason_{args.dataset}_we_{args.alpha}_{args.beta}_tau_{args.tau1}_{args.tau2}{args.suff}.json', 'w', encoding='utf-8') as f:
                     json.dump(texts_reason, f, ensure_ascii=False, indent=4)
                     
                 #print(len(mis_mask),len(texts_generate))
@@ -163,27 +148,39 @@ def train(args,data,seeds):
                 prompts_classify1, prompts_classify2 = prompt.prompt_aug_classifier(data_obj=data, sampled_node_idxs=uncertain_mask, aug_node_texts=texts_generate, topic_clusters=topics_generate, dataset_name=args.dataset)
                 
                 label_classify1, label1_reason = prompt.efficient_gpt_text_cls(prompts_classify1, n_clusters)
-                with open(f'jsons/magi_label1_reason_{args.dataset}_we_{args.alpha}_{args.beta}_tau_{args.tau1}_{args.tau2}.json', 'w', encoding='utf-8') as f:
+                with open(f'jsons/magi_label1_reason_{args.dataset}_we_{args.alpha}_{args.beta}_tau_{args.tau1}_{args.tau2}{args.suff}.json', 'w', encoding='utf-8') as f:
                     json.dump(label1_reason, f, ensure_ascii=False, indent=4)
                
                 label_classify2, label2_reason = prompt.efficient_gpt_text_cls(prompts_classify2, n_clusters)
-                with open(f'jsons/magi_label2_reason_{args.dataset}_we_{args.alpha}_{args.beta}_tau_{args.tau1}_{args.tau2}.json', 'w', encoding='utf-8') as f:
+                with open(f'jsons/magi_label2_reason_{args.dataset}_we_{args.alpha}_{args.beta}_tau_{args.tau1}_{args.tau2}{args.suff}.json', 'w', encoding='utf-8') as f:
                     json.dump(label2_reason, f, ensure_ascii=False, indent=4)                 
                 for idx in range(len(uncertain_mask)):
                     labels_llm_ge[int(uncertain_mask[idx])] = [int(label_classify1[idx]),int(label_classify2[idx])] # first label ; second consistence
-                with open(f'jsons/magi_labels_{args.dataset}_we_{args.alpha}_{args.beta}_tau_{args.tau1}_{args.tau2}.json', 'w', encoding='utf-8') as f:
+                with open(f'jsons/magi_labels_{args.dataset}_we_{args.alpha}_{args.beta}_tau_{args.tau1}_{args.tau2}{args.suff}.json', 'w', encoding='utf-8') as f:
                     json.dump(labels_llm_ge, f, ensure_ascii=False, indent=4)
+                '''
+                with open(f'jsons/magi_texts_{args.dataset}_we_{args.alpha}_{args.beta}_tau_{args.tau1}_{args.tau2}{args.suff}.json', 'r', encoding='utf-8') as f:
+                    texts_generate = json.load(f) 
+                with open(f'jsons/magi_labels_{args.dataset}_we_{args.alpha}_{args.beta}_tau_{args.tau1}_{args.tau2}{args.suff}.json', 'r', encoding='utf-8') as f:
+                    labels_llm_ge = json.load(f)
 
+                uncertain_mask, label_classify1, label_classify2 = [],[],[]
+                for key, value in labels_llm_ge.items():
+                    uncertain_mask.append(int(key))
+                    label_classify1.append(int(value[0]))
+                    label_classify2.append(int(value[1]))
+                uncertain_mask = np.array(uncertain_mask)
+                '''
 
                 ground_truth = np.array([mapping[int(label)] for label in data.y[uncertain_mask]])
                 llm_idx = np.array([i for i in range(len(label_classify1)) if label_classify1[i] == label_classify2[i]])
                 llm_labels = np.array([label_classify1[i] for i in range(len(label_classify1)) if label_classify1[i] == label_classify2[i]])
-                print(uncertain_mask)
-                print(len(llm_labels), len(uncertain_mask), len(llm_labels)/len(uncertain_mask))
-                print("label_classify1")
-                print(label_classify1)
-                print("label_classify2")
-                print(label_classify2)
+                #print(uncertain_mask)
+                #print(len(llm_labels), len(uncertain_mask), len(llm_labels)/len(uncertain_mask))
+                #print("label_classify1")
+                #print(label_classify1)
+                #print("label_classify2")
+                #print(label_classify2)
                 #print("Ground truth")
                 #print(ground_truth)
                 acc_gen1,acc_gen2 = np.array(label_classify1==ground_truth).mean(), np.array(label_classify2==ground_truth).mean()
@@ -195,25 +192,33 @@ def train(args,data,seeds):
                     data_obj.x[uncertain_mask[idx]] = (data_obj.x[uncertain_mask[idx]] + texts_generate_embed[idx])/2
             assert g_feat1[uncertain_mask[llm_idx]].shape[0] == len(llm_labels)
             cl_loss2 = model.cl_loss2(g_feat1[uncertain_mask[llm_idx]], g_feat_confi, torch.tensor(llm_labels,dtype=torch.long).to(args.device), args.tau2)
+            #criterion = nn.BCEWithLogitsLoss()
+            #mask = torch.cat([torch.ones(len(uncertain_mask)), torch.zeros(len(uncertain_mask))])
+            #mask = mask.view(-1,1).to(args.device)
+            #y_dis = model.readout(torch.cat([data_obj.x[uncertain_mask], texts_generate_embed], dim=0))
+            #dis_loss = criterion(y_dis, mask)
 
             #print(uncertain_mask)
-            loss = args.beta * cl_loss1 + (1 - args.beta) * cl_loss2
-            #loss = args.beta * magi_loss + (1-args.beta)*cl_loss2
-            #log(f"{epoch+1} finetune_epoch ||| Loss: {round(float(loss),3)}||| magi_loss: {round(float(magi_loss),3)}  ||| cl_loss2: {round(float(cl_loss2),3)}")            
-            log(f"{epoch+1} finetune_epoch ||| Loss: {round(float(loss),3)}||| cl_loss1: {round(float(cl_loss1),3)}  ||| cl_loss2: {round(float(cl_loss2),3)}")
+            #loss = args.beta * cl_loss1 + (1 - args.beta) * cl_loss2 + dis_loss
+            if args.dataset in ['cora','wikics']:
+                loss = args.beta * cl_loss1 + (1-args.beta)*cl_loss2          
+                log(f"{epoch+1} finetune_epoch ||| Loss: {round(float(loss),3)}||| cl_loss1: {round(float(cl_loss1),3)}  ||| cl_loss2: {round(float(cl_loss2),3)}")
+            else:
+                loss = args.beta * magi_loss + (1-args.beta)*cl_loss2          
+                log(f"{epoch+1} finetune_epoch ||| Loss: {round(float(loss),3)}||| magi_loss: {round(float(magi_loss),3)}  ||| cl_loss2: {round(float(cl_loss2),3)}")
             train_loss['llm_train'].append(loss.clone().detach().cpu().numpy())
             
             loss.backward()
             optimizer.step() 
             
             model.eval()
-            conduct_list,modul_list,acc_list,nmi_list,ari_list,f1_list = {'all':[],'mis':[],'unmis':[]},{'all':[],'mis':[],'unmis':[]},{'all':[],'mis':[],'unmis':[]},{'all':[],'mis':[],'unmis':[]},{'all':[],'mis':[],'unmis':[]},{'all':[],'mis':[],'unmis':[]}
+            conduct_list,modul_list,acc_list,nmi_list,ari_list,f1_list = [],[],[],[],[],[]
             
             with torch.no_grad():
                 g_feat1,g_feat2,_,_ = model(data_obj)
                 #y_pred,_,mis_mask = model.cluster(g_feat1,g_feat2)
                 if (epoch + 1) % 10 == 0:
-                    torch.save([g_feat1.cpu(),g_feat2.cpu()],"models/magi_embeds_{args.dataset}_1_{args.tau1}_{args.tau2}_{epoch}.pt")
+                    #torch.save([g_feat1.cpu(),g_feat2.cpu()],"models/magi_embeds_{args.dataset}_1_{args.tau1}_{args.tau2}_{epoch}.pt")
                     for seed in seeds:
                         y_pred, mis_mask = model.cluster(g_feat1,g_feat2,seed)     
                         y_assignments = y_pred
@@ -224,38 +229,15 @@ def train(args,data,seeds):
                         ari = adjusted_rand_score(y_true, y_assignments)
                         acc,f1 = calculate_accuracy_and_f1(y_true,y_assignments)
                         #g_feat = g_feat1.cpu().detach().numpy()
-                        # hard samples
-                        nmi_hard = normalized_mutual_info_score(y_true[mis_mask],y_assignments[mis_mask])
-                        ari_hard = adjusted_rand_score(y_true[mis_mask], y_assignments[mis_mask])
-                        acc_hard,f1_hard = calculate_accuracy_and_f1(y_true[mis_mask],y_assignments[mis_mask])
-                    
-                        # easy samples
-                        nmi_easy = normalized_mutual_info_score(y_true[~mis_mask],y_assignments[~mis_mask])
-                        ari_easy = adjusted_rand_score(y_true[~mis_mask], y_assignments[~mis_mask])
-  
-                        acc_easy,f1_easy = calculate_accuracy_and_f1(y_true[~mis_mask],y_assignments[~mis_mask]) 
-                        conduct_list['all'].append(conduct)
-                        modul_list['all'].append(modul)
-                        acc_list['all'].append(acc)
-                        nmi_list['all'].append(nmi)
-                        ari_list['all'].append(ari)
-                        f1_list['all'].append(f1) 
-
-                        acc_list['mis'].append(acc_hard)
-                        nmi_list['mis'].append(nmi_hard)
-                        ari_list['mis'].append(ari_hard)
-                        f1_list['mis'].append(f1_hard) 
-                        acc_list['unmis'].append(acc_easy)
-                        nmi_list['unmis'].append(nmi_easy)
-                        ari_list['unmis'].append(ari_easy)
-                        f1_list['unmis'].append(f1_easy)                         
+                        conduct_list.append(conduct)
+                        modul_list.append(modul)
+                        acc_list.append(acc)
+                        nmi_list.append(nmi)
+                        ari_list.append(ari)
+                        f1_list.append(f1)                         
                         log(f"{epoch+1} {seed} finetune_val_epoch ||| conductance: {round(float(conduct),3)} ||| modularity: {round(float(modul),3)} ||| accuracy: {round(float(acc),3)} ||| nmi: {round(float(nmi),3)} |||ari: {round(float(ari),3)}|||f1 score : {round(float(f1),3)}")
-                        log(f"{epoch+1} {seed} finetune_val_epoch easy ||| accuracy: {round(float(acc_easy),3)} ||| nmi: {round(float(nmi_easy),3)} |||ari: {round(float(ari_easy),3)}|||f1 score : {round(float(f1_easy),3)}")
-                        log(f"{epoch+1} {seed} finetune_val_epoch hard ||| accuracy: {round(float(acc_hard),3)} ||| nmi: {round(float(nmi_hard),3)} |||ari: {round(float(ari_hard),3)}|||f1 score : {round(float(f1_hard),3)}") 
                     
-                    log(f"{epoch+1} {seed} finetune_val_epoch ||| conductance mean: {round(float(np.mean(conduct_list['all'])),3)}  ||| conductance std: {round(float(np.std(conduct_list['all'])),3)}||| modularity mean : {round(float(np.mean(modul_list['all'])),3)} ||| modularity std : {round(float(np.std(modul_list['all'])),3)} ||| accuracy mean: {round(float(np.mean(acc_list['all'])),3)}||| accuracy std: {round(float(np.std(acc_list['all'])),3)} ||| nmi mean: {round(float(np.mean(nmi_list['all'])),3)} ||| nmi std: {round(float(np.std(nmi_list['all'])),3)}|||ari mean: {round(float(np.mean(ari_list['all'])),3)}|||ari std: {round(float(np.std(ari_list['all'])),3)}|||f1 score mean: {round(float(np.mean(f1_list['all'])),3)}|||f1 score std: {round(float(np.std(f1_list['all'])),3)}")
-                    log(f"{epoch+1} {seed} finetune_val_epoch hard ||| accuracy mean: {round(float(np.mean(acc_list['mis'])),3)}||| accuracy std: {round(float(np.std(acc_list['mis'])),3)} ||| nmi mean: {round(float(np.mean(nmi_list['mis'])),3)} ||| nmi std: {round(float(np.std(nmi_list['mis'])),3)}|||ari mean: {round(float(np.mean(ari_list['mis'])),3)}|||ari std: {round(float(np.std(ari_list['mis'])),3)}|||f1 score mean: {round(float(np.mean(f1_list['mis'])),3)}|||f1 score std: {round(float(np.std(f1_list['mis'])),3)}")
-                    log(f"{epoch+1} {seed} finetune_val_epoch easy ||| accuracy mean: {round(float(np.mean(acc_list['unmis'])),3)}||| accuracy std: {round(float(np.std(acc_list['unmis'])),3)} ||| nmi mean: {round(float(np.mean(nmi_list['unmis'])),3)} ||| nmi std: {round(float(np.std(nmi_list['unmis'])),3)}|||ari mean: {round(float(np.mean(ari_list['unmis'])),3)}|||ari std: {round(float(np.std(ari_list['unmis'])),3)}|||f1 score mean: {round(float(np.mean(f1_list['unmis'])),3)}|||f1 score std: {round(float(np.std(f1_list['unmis'])),3)}")       
+                    log(f"{epoch+1} finetune_val_epoch ||| conductance mean: {round(float(np.mean(conduct_list)),3)}  ||| conductance std: {round(float(np.std(conduct_list)),3)}||| modularity mean : {round(float(np.mean(modul_list)),3)} ||| modularity std : {round(float(np.std(modul_list)),3)} ||| accuracy mean: {round(float(np.mean(acc_list)),3)}||| accuracy std: {round(float(np.std(acc_list)),3)} ||| nmi mean: {round(float(np.mean(nmi_list)),3)} ||| nmi std: {round(float(np.std(nmi_list)),3)}|||ari mean: {round(float(np.mean(ari_list)),3)}|||ari std: {round(float(np.std(ari_list)),3)}|||f1 score mean: {round(float(np.mean(f1_list)),3)}|||f1 score std: {round(float(np.std(f1_list)),3)}")      
                     
                 
 
@@ -294,7 +276,8 @@ if __name__=="__main__":
     parser.add_argument('--lr', type=float, default=0.0005, help='learning rate')
     parser.add_argument('--wd', type=float, default=1e-3, help='weight decay')
     #parser.add_argument('--epochs', type=int, default=400)
-    parser.add_argument('--ns', type=float, default=0.5, help='')    
+    parser.add_argument('--ns', type=float, default=0.5, help='') 
+    parser.add_argument('--suff', type=str, default='')
     
     args = parser.parse_args()
     args.device = f"cuda:{args.gpu}"
