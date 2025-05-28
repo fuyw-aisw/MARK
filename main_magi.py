@@ -246,7 +246,7 @@ if __name__=="__main__":
     parser.add_argument('--dataset',default='cora',type=str)
     parser.add_argument('--embed_type',default='sbert',type=str)
     parser.add_argument('--epochs', type=int, default=200) 
-    parser.add_argument('--warm_up_epochs', type=int, default=100)
+    parser.add_argument('--warm_up_epochs', type=int, default=200)
     parser.add_argument('--seed_num', type=int, default=5)
     parser.add_argument('--optim',type=str, default='adam')
     parser.add_argument('--alpha',help='hyper-parameter to control the weights',type=float, default=0.1)
