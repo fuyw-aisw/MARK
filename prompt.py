@@ -190,6 +190,10 @@ def efficient_gpt_text_ge(input_text):
             #print(match)
             if match:
                 result = match.group(1)
+            else:
+                match = re.search(r'"answer":\s*"((?:\\"|.*?)*?)",\s*', gpt_result[i][0],re.DOTALL)
+                if match:
+                    result = match.group(1)
         except ValueError:
             pass
         if result is None:
