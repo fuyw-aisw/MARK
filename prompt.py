@@ -146,11 +146,15 @@ def efficient_gpt_text_ind(input_text):
     for i in range(len(gpt_result)):
         result = None
         try:
-            match = re.search(r'"answer"\s*:\s*"(.*?)"', gpt_result[i][0], re.DOTALL)
-            if match:
-                result = match.group(1)
-        except ValueError:
-            pass
+            data = json.loads(gpt_result[i][0])
+            result = data.get("answer")
+        except:
+            try:
+                match = re.search(r'"answer"\s*:\s*"(.*?)"', gpt_result[i][0], re.DOTALL)
+                if match:
+                    result = match.group(1)
+            except ValueError:
+                pass
         if result is None:
             final_result.append("Error occured")
         else:
@@ -186,16 +190,16 @@ def efficient_gpt_text_ge(input_text):
     for i in range(len(gpt_result)):
         result = None
         try:
-            match = re.search(r'"answer":\s*(\{.*?\})', gpt_result[i][0],re.DOTALL)
-            #print(match)
-            if match:
-                result = match.group(1)
-            else:
-                match = re.search(r'"answer":\s*"((?:\\"|.*?)*?)",\s*', gpt_result[i][0],re.DOTALL)
+            data = json.loads(gpt_result[i][0])
+            result = data.get("answer")
+        except:
+            try:
+                match = re.search(r'"answer":\s*(\{.*?\})', gpt_result[i][0],re.DOTALL)
+                #print(match)
                 if match:
                     result = match.group(1)
-        except ValueError:
-            pass
+            except ValueError:
+                pass
         if result is None:
             final_result.append("Error occured")
         else:
@@ -232,11 +236,15 @@ def efficient_gpt_text_cls(input_text, n_clusters):
     for i in range(len(gpt_result)):
         result = None
         try:
-            match = re.search(r'"answer"\s*:\s*"?(\d+)"?', gpt_result[i][0])
-            if match:
-                result = int(match.group(1))
-        except ValueError:
-            pass
+            data = json.loads(gpt_result[i][0])
+            result = data.get("answer")
+        except:
+            try:
+                match = re.search(r'"answer"\s*:\s*"?(\d+)"?', gpt_result[i][0])
+                if match:
+                    result = int(match.group(1))
+            except ValueError:
+                pass
         if result is None:
             result = random.choices(classes, probs)[0] + 1
         if int(result - 1) in range(n_clusters):
