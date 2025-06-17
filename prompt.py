@@ -158,7 +158,7 @@ def efficient_gpt_text_ind(input_text):
         if result is None:
             final_result.append("Error occured")
         else:
-            final_result.append(result)
+            final_result.append(str(result))
         
     return final_result, gpt_result
 
@@ -203,7 +203,7 @@ def efficient_gpt_text_ge(input_text):
         if result is None:
             final_result.append("Error occured")
         else:
-            final_result.append(result)
+            final_result.append(str(result))
             
     return final_result, gpt_result
 
