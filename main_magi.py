@@ -103,12 +103,10 @@ def train(args,data,seeds):
             magi_loss = model.magi_loss(g_feat1,mask_aug1) + model.magi_loss(g_feat2,mask_aug2)
             #torch.save(g_feat1.detach().cpu(),f"models/g_feat_{args.dataset}.pt")
             cl_loss1 = model.cl_loss1(g_feat1,g_feat2,args.tau1)
+            y_assignments,mis_mask = model.cluster(g_feat1,g_feat2)
+            g_feat_confi = torch.stack([g_feat1[y_assignments == i].detach().mean(axis=0) for i in range(args.num_classes)]).to(args.device)
             if epoch % 100 == 0:
-                y_assignments,mis_mask = model.cluster(g_feat1,g_feat2)
                 uncertain_mask = mis_mask.copy()
-                #uncertain_mask = np.array([0,1])
-                #y_assignments = torch.argmax(y_pred.cpu(), dim=-1).numpy()
-                g_feat_confi = torch.stack([g_feat1[y_assignments == i].detach().mean(axis=0) for i in range(args.num_classes)]).to(args.device)
                 confi_mask = {}
                 for i in range(args.num_classes):
                     idx_in_cluster = np.nonzero(y_assignments == i)[0]
