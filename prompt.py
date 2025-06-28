@@ -236,15 +236,11 @@ def efficient_gpt_text_cls(input_text, n_clusters):
     for i in range(len(gpt_result)):
         result = None
         try:
-            data = json.loads(gpt_result[i][0])
-            result = data.get("answer")
-        except:
-            try:
-                match = re.search(r'"answer"\s*:\s*"?(\d+)"?', gpt_result[i][0])
-                if match:
-                    result = int(match.group(1))
-            except ValueError:
-                pass
+            match = re.search(r'"answer"\s*:\s*"?(\d+)"?', gpt_result[i][0])
+            if match:
+                result = int(match.group(1))
+        except ValueError:
+            pass
         if result is None:
             result = random.choices(classes, probs)[0] + 1
         if int(result - 1) in range(n_clusters):
