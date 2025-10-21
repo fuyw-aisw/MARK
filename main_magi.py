@@ -245,7 +245,7 @@ def train(args,data,seeds):
                         best_results['f1'] = [round(float(np.mean(f1_list)),3), round(float(np.std(f1_list)),3)]
                         
                     log(f"{epoch+1} finetune_val_epoch ||| conductance mean: {round(float(np.mean(conduct_list)),3)}  ||| conductance std: {round(float(np.std(conduct_list)),3)}||| modularity mean : {round(float(np.mean(modul_list)),3)} ||| modularity std : {round(float(np.std(modul_list)),3)} ||| accuracy mean: {round(float(np.mean(acc_list)),3)}||| accuracy std: {round(float(np.std(acc_list)),3)} ||| nmi mean: {round(float(np.mean(nmi_list)),3)} ||| nmi std: {round(float(np.std(nmi_list)),3)}|||ari mean: {round(float(np.mean(ari_list)),3)}|||ari std: {round(float(np.std(ari_list)),3)}|||f1 score mean: {round(float(np.mean(f1_list)),3)}|||f1 score std: {round(float(np.std(f1_list)),3)}")     
-            log(f"Final result ||| accuracy mean: {best_results['acc'][0]} |||  accuracy std: {best_results['acc'][1]} ||| nmi mean: {best_results['nmi'][0]} |||  nmi std: {best_results['nmi'][1]} ||| ari mean: {best_results['ari'][0]} |||  ari std: {best_results['ari'][1]} ||| f1 mean: {best_results['f1'][0]} ||| f1 std: {best_results['f1'][1]}")  
+        log(f"Final result ||| accuracy mean: {best_results['acc'][0]} |||  accuracy std: {best_results['acc'][1]} ||| nmi mean: {best_results['nmi'][0]} |||  nmi std: {best_results['nmi'][1]} ||| ari mean: {best_results['ari'][0]} |||  ari std: {best_results['ari'][1]} ||| f1 mean: {best_results['f1'][0]} ||| f1 std: {best_results['f1'][1]}")  
                         
                     
                 
