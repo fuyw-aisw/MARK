@@ -1,5 +1,5 @@
 # MARK
-PyTorch implementation for "MARK: Multi-agent Collaboration with Ranking Guidance for Text-attributed Graph Clustering"
+PyTorch implementation for "MARK: Multi-agent Collaboration with Ranking Guidance for Text-attributed Graph Clustering", ACL Findings 2025
 
 ## Overview
 
